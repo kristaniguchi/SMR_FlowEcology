@@ -51,4 +51,71 @@ filename1 <- "C:/Users/KristineT/SCCWRP/Santa Margarita River Climate Change Ana
 write.csv(deltaH.outputs2, filename1, row.names=FALSE)
 
 ####DeltaH limits on important metrics for CSCI and ASCI
+  #determine if the change in median is within our outside of bio threshold
+
+#read in deltaH thresholds for CSCI and ASCI
+bio.thresholds <- read.csv("C:/Users/KristineT/SCCWRP/SOC WQIP - Flow Ecology Study - General/Tier2_analysis/08_all_delta_thresholds.csv")
+unique.metrics <- unique(bio.thresholds$metric)
+
+#subset deltaH.outputs2 to unique metrics for CSCI/ASCI
+deltaH.outputs2.sub <- deltaH.outputs2[deltaH.outputs2$metric  %in% unique.metrics,]
+#add output columns for asci and csci suitability
+deltaH.outputs2.sub$CSCI_Suitability_p50 <- NA
+deltaH.outputs2.sub$ASCI_Suitability_p50 <- NA
+
+
+#loop to determine if deltaH for p50 is outside or within the flow range
+for(k in 1:length(deltaH.outputs2.sub$X)){
+  #subset row k
+  sub <- deltaH.outputs2.sub[k,]
+  #metric
+  metric.k <- sub$metric
+  
+  #find limits for metric.k
+  limits <- bio.thresholds[bio.thresholds$metric == metric.k,] %>% 
+    na.omit()
+  
+  #if metric is Q99, find both ASCI and CSCI limits; else just
+  #unique.bio
+  if(metric.k == "Q99"){
+    #ASCI
+    asci.limits <- limits[limits$Biol == "ASCI",]
+    #if below negative limit or above positive limit, class as likely altered, else likely unaltered
+    asci.p50.delta.class <- ifelse(sub$p50 < asci.limits$Threshold50[asci.limits$Delta == "negative"] | 
+                                sub$p50 > asci.limits$Threshold50[asci.limits$Delta == "positive"],
+                              "likely altered", "likely unaltered")
+    #save into column
+    deltaH.outputs2.sub$ASCI_Suitability_p50[k] <- asci.p50.delta.class
+    
+    #CSCI
+    csci.limits <- limits[limits$Biol == "CSCI",]
+    #if below negative limit or above positive limit, class as likely altered, else likely unaltered
+    csci.p50.delta.class <- ifelse(sub$p50 < csci.limits$Threshold50[csci.limits$Delta == "negative"] | 
+                                     sub$p50 > csci.limits$Threshold50[csci.limits$Delta == "positive"],
+                                   "likely altered", "likely unaltered")
+    #save into column
+    deltaH.outputs2.sub$CSCI_Suitability_p50[k] <- csci.p50.delta.class
+    
+  }else{
+    #else if other metrics, only one bioindex per metric
+    #if below negative limit or above positive limit, class as likely altered, else likely unaltered
+    p50.delta.class <- ifelse(sub$p50 < limits$Threshold50[limits$Delta == "negative"] | 
+                                     sub$p50 > limits$Threshold50[limits$Delta == "positive"],
+                                   "likely altered", "likely unaltered")
+    #find bio-metric
+    bio.metric <- unique(limits$Biol)
+    #save into column
+    col.ind <- ifelse(bio.metric == "ASCI", 
+                      grep("ASCI",names(deltaH.outputs2.sub)), 
+                      grep("CSCI",names(deltaH.outputs2.sub)))
+    #save into column for bio.metric
+    deltaH.outputs2.sub[k,col.ind] <- p50.delta.class
+    
+  }
+}
+
+filename2 <- "C:/Users/KristineT/SCCWRP/Santa Margarita River Climate Change Analyses - FlowEcology/FlowData/FFM/FFM_DeltaH_all_scenarios_CSCIASCI_alteration.csv"
+write.csv(deltaH.outputs2.sub, filename2, row.names=FALSE)
+
+
   
