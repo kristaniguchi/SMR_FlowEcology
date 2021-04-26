@@ -1,3 +1,8 @@
+#create hydrograph plots of change from current to future for the 3 GCMs - plot annual hydrograph of mean daily flow across 3 time periods for each GCM
+  #Focus on future with CWRMA
+
+
+
 #load other packages
 library("ggplot2")
 library("scales")
