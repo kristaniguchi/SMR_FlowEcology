@@ -126,3 +126,162 @@ for(i in 1:length(sites)){
   }
 }
 
+
+
+###########################################################
+#Bar plot of p10 Delta H for each metric for each site
+
+sites <- unique(results$Site)
+metrics <- unique(results$metric)
+metric.names <- c("Dry Season Baseflow Magnitude (cfs)", "Spring Recession Duration (days)", "Wet Season Baseflow Duration (days)", "Wet Season Baseflow Magnitude (cfs)", "Magnitude of Largest Annual Storm (cfs)")
+
+#output director for p10 deltaH barplots
+out.dir2 <- paste0(out.dir, "p10_barplots/")
+dir.create(out.dir2)
+
+
+for(i in 1:length(sites)){
+  #subset to site i
+  results.sub <- results %>% 
+    filter(Site == sites[i])
+  
+  #make plots for each metric
+  for(j in 1:length(metrics)){
+    results.sub.metric <- results.sub %>% 
+      filter(metric == metrics[j])
+    
+    #y-axis label
+    ylab.name <- paste0("Change in ", metric.names[j])
+    
+    #find the thresholds for CSCI and/or ASCI for metric j
+    bio.thresholds.sub <- bio.thresholds %>% 
+      filter(metric == metrics[j])
+    
+    #make faceted bar plots by ScenarioType (Current, Future) and GCM, color = CRWMA and no CWRMA
+    barplot <- ggplot(results.sub.metric, aes(x=bar.labels1, y=p10, fill=CWRMA)) +
+      facet_wrap(~facet.gcm.name,  ncol=3) +
+      geom_bar(stat="identity") + 
+      labs(title = paste0(sites[i]), subtitle=metric.names[j],
+           color = "Legend") + ylab(ylab.name) + xlab("") +
+      
+      theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+            panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) +
+      
+      theme_bw() + theme(legend.position="bottom") +
+      theme(axis.text.x = element_text(angle = 45, hjust=1)) +
+      geom_hline(yintercept = bio.thresholds.sub$Threshold50[1], lty = "dashed") +
+      geom_hline(yintercept = bio.thresholds.sub$Threshold50[2], lty = "dashed") +
+      geom_hline(yintercept = 0) 
+    
+    
+    #if Q99, add in thresholds for CSCI and ASCI
+    if(metrics[j] == "Q99"){
+      #make faceted bar plots by ScenarioType (Current, Future) and GCM, color = CRWMA and no CWRMA
+      barplot <- ggplot(results.sub.metric, aes(x=bar.labels1, y=p10, fill=CWRMA)) +
+        facet_wrap(~facet.gcm.name,  ncol=3) +
+        geom_bar(stat="identity") + 
+        labs(title = paste0(sites[i]), subtitle=metric.names[j],
+             color = "Legend") + ylab(ylab.name) + xlab("") +
+        
+        theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+              panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) +
+        theme_bw() + theme(legend.position="bottom") +
+        theme(axis.text.x = element_text(angle = 45, hjust=1)) +
+        geom_hline(yintercept = bio.thresholds.sub$Threshold50[1], lty = "dashed") +
+        geom_hline(yintercept = bio.thresholds.sub$Threshold50[2], lty = "dashed") +
+        geom_hline(yintercept = 0) +
+        geom_hline(yintercept = bio.thresholds.sub$Threshold50[3], lty = "dashed", color= "green") +
+        geom_hline(yintercept = bio.thresholds.sub$Threshold50[4], lty = "dashed", color= "green") 
+      
+      
+    }
+    
+    print(barplot)
+    
+    #save
+    file.name2 <- paste0(out.dir2, sites[i], "_", metrics[j], "_DeltaH_p10_barplots.jpg")
+    ggsave(barplot, filename=file.name2, dpi=300, height=5, width=10)
+    
+    
+  }
+}
+
+
+###########################################################
+#Bar plot of p10 Delta H for each metric for each site
+
+sites <- unique(results$Site)
+metrics <- unique(results$metric)
+metric.names <- c("Dry Season Baseflow Magnitude (cfs)", "Spring Recession Duration (days)", "Wet Season Baseflow Duration (days)", "Wet Season Baseflow Magnitude (cfs)", "Magnitude of Largest Annual Storm (cfs)")
+
+#output director for p10 deltaH barplots
+out.dir3 <- paste0(out.dir, "p90_barplots/")
+dir.create(out.dir3)
+
+
+for(i in 1:length(sites)){
+  #subset to site i
+  results.sub <- results %>% 
+    filter(Site == sites[i])
+  
+  #make plots for each metric
+  for(j in 1:length(metrics)){
+    results.sub.metric <- results.sub %>% 
+      filter(metric == metrics[j])
+    
+    #y-axis label
+    ylab.name <- paste0("Change in ", metric.names[j])
+    
+    #find the thresholds for CSCI and/or ASCI for metric j
+    bio.thresholds.sub <- bio.thresholds %>% 
+      filter(metric == metrics[j])
+    
+    #make faceted bar plots by ScenarioType (Current, Future) and GCM, color = CRWMA and no CWRMA
+    barplot <- ggplot(results.sub.metric, aes(x=bar.labels1, y=p90, fill=CWRMA)) +
+      facet_wrap(~facet.gcm.name,  ncol=3) +
+      geom_bar(stat="identity") + 
+      labs(title = paste0(sites[i]), subtitle=metric.names[j],
+           color = "Legend") + ylab(ylab.name) + xlab("") +
+      
+      theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+            panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) +
+      
+      theme_bw() + theme(legend.position="bottom") +
+      theme(axis.text.x = element_text(angle = 45, hjust=1)) +
+      geom_hline(yintercept = bio.thresholds.sub$Threshold50[1], lty = "dashed") +
+      geom_hline(yintercept = bio.thresholds.sub$Threshold50[2], lty = "dashed") +
+      geom_hline(yintercept = 0) 
+    
+    
+    #if Q99, add in thresholds for CSCI and ASCI
+    if(metrics[j] == "Q99"){
+      #make faceted bar plots by ScenarioType (Current, Future) and GCM, color = CRWMA and no CWRMA
+      barplot <- ggplot(results.sub.metric, aes(x=bar.labels1, y=p90, fill=CWRMA)) +
+        facet_wrap(~facet.gcm.name,  ncol=3) +
+        geom_bar(stat="identity") + 
+        labs(title = paste0(sites[i]), subtitle=metric.names[j],
+             color = "Legend") + ylab(ylab.name) + xlab("") +
+        
+        theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+              panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) +
+        theme_bw() + theme(legend.position="bottom") +
+        theme(axis.text.x = element_text(angle = 45, hjust=1)) +
+        geom_hline(yintercept = bio.thresholds.sub$Threshold50[1], lty = "dashed") +
+        geom_hline(yintercept = bio.thresholds.sub$Threshold50[2], lty = "dashed") +
+        geom_hline(yintercept = 0) +
+        geom_hline(yintercept = bio.thresholds.sub$Threshold50[3], lty = "dashed", color= "green") +
+        geom_hline(yintercept = bio.thresholds.sub$Threshold50[4], lty = "dashed", color= "green") 
+      
+      
+    }
+    
+    print(barplot)
+    
+    #save
+    file.name2 <- paste0(out.dir3, sites[i], "_", metrics[j], "_DeltaH_p90_barplots.jpg")
+    ggsave(barplot, filename=file.name2, dpi=300, height=5, width=10)
+    
+    
+  }
+}
+
