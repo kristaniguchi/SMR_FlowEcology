@@ -102,7 +102,7 @@ for(i in 1:2){
     #UPDATE group by water year day, summarize mean, 10th, 50th, 90th 
     dat3<-dat%>%
       group_by(Water.year)%>% 
-      mutate(Day = 1:n()) #assign water year day to each flow
+      dplyr::mutate(Day = 1:n()) #assign water year day to each flow
     
     # summarize the 10th, 50th, and 90th, mean of daily flow for WY
     current.flow <- dat3 %>% 
